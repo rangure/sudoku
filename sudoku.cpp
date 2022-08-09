@@ -1,7 +1,49 @@
 #include <iostream>
+#include <stdlib.h>
+#include <ctime>
 using namespace std;
 Sudoku::Sudoku(){
-
+    for(int i = 0; i < 9 ; i ++)
+    {
+        for(int j = 0; j < 9; j++)
+        {
+            problem[i][j] = 0;
+        }
+    }
+    srand(time(0));
+    int ret = findSolution(81);
+    int toRemoveSize = 50;
+    // int removeList[toRemoveSize];
+    int removeCount = 0;
+    for(int i = 0; i < toRemoveSize; i++)
+    {
+        int index = rand() % 81;
+        // removeList[i] = x;
+        int x,y;
+        x = index / 9;
+        y = index - x * 9;
+        if(problem[x][y] == 0)
+        {
+            continue;
+        }
+        else
+        {
+            int oldValue = problem[x][y];
+            problem[x][y] = 0;
+            int numSolution = SudokuSolverHelper(removeCount + 1);
+            if(numSolution == 1)
+            {
+                removeCount++;
+            }
+            else
+            {
+                problem[x][y] = oldValue;
+            }
+        }
+    }
+    int finalresult = SudokuSolverHelper(removeCount);
+    cout << "there are " << finalresult << " solutions on the generated sudoku" <<endl;
+    cout << removeCount << " numbers removed" <<endl;
 }
 
 Sudoku::Sudoku(int givenProblem[][9]){
@@ -16,6 +58,8 @@ Sudoku::Sudoku(int givenProblem[][9]){
 
 void Sudoku::SudokuSolver(){
     int n = 0;
+    srand(time(0));
+
      for(int i = 0; i < 9 ; i ++)
     {
         for(int j = 0; j < 9; j++)
@@ -24,7 +68,7 @@ void Sudoku::SudokuSolver(){
                 n++;
         }
     }
-
+    cout << endl;
     int ret = findSolution(n);
     if(ret != 0)
     {
@@ -47,10 +91,11 @@ int Sudoku::SudokuSolverHelper(int n){
         {
             if(problem[i][j] == 0)
             {
-                int  solutioncount = 0 ; 
-                for(int z = 1; z <= 9; z++ )
+                int solutioncount = 0 ; 
+
+                for(int z = 0; z < 9; z++ )
                 {
-                    problem[i][j] = z;
+                    problem[i][j] = z + 1;
                     int ret = 0;
                     if(isValid(i,j))
                     {
@@ -60,7 +105,7 @@ int Sudoku::SudokuSolverHelper(int n){
                     {
                          solutioncount += ret;
                     }
-                    if(z == 9 && solutioncount == 0)
+                    if(z == 8 && solutioncount == 0)
                     {
                         problem[i][j] = 0;
                         return 0;
@@ -84,9 +129,20 @@ int Sudoku::findSolution(int n){
         {
             if(problem[i][j] == 0)
             {
-                for(int z = 1; z <= 9; z++ )
+                int randindex[9] = {0};
+                
+                for(int k = 0; k < 9; k++)
                 {
-                    problem[i][j] = z;
+                    int index = rand() % 9;
+                    while(randindex[index % 9] != 0)
+                    {
+                        index++;
+                    }
+                    randindex[index % 9] = k + 1;
+                }
+                for(int z = 0; z < 9; z++ )
+                {
+                    problem[i][j] = randindex[z];
                     int ret = 0;
                     if(isValid(i,j))
                     {
@@ -96,7 +152,7 @@ int Sudoku::findSolution(int n){
                     {
                          return ret;
                     }
-                    if(z == 9)
+                    if(z == 8)
                     {
                         problem[i][j] = 0;
                         return 0;
