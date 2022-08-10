@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
 #include <ctime>
 using namespace std;
 Sudoku::Sudoku(){
@@ -44,14 +45,19 @@ Sudoku::Sudoku(){
     int finalresult = SudokuSolverHelper(removeCount);
     cout << "there are " << finalresult << " solutions on the generated sudoku" <<endl;
     cout << removeCount << " numbers removed" <<endl;
+    emptySlot = removeCount;
+    memcpy((void*)problemOriginal, (void*)problem, 81*sizeof(int));
 }
 
 Sudoku::Sudoku(int givenProblem[][9]){
+    emptySlot = 0;
     for(int i = 0; i < 9 ; i ++)
     {
         for(int j = 0; j < 9; j++)
         {
             problem[i][j] = givenProblem[i][j];
+            if(!givenProblem[i][j])
+                emptySlot++ ;
         }
     }
 }
@@ -73,6 +79,7 @@ void Sudoku::SudokuSolver(){
     if(ret != 0)
     {
         cout<<"solved!!"<<endl;
+        emptySlot = 0;
     }
     else
     {
@@ -195,15 +202,44 @@ bool Sudoku::isValid(int x, int y){
     return true;
 }
 
-void Sudoku::SudokuPrinter()
+void Sudoku::SudokuPrinter(int flag)
 {
+
     for(int i = 0; i < 9 ; i ++)
     {
         for(int j = 0; j < 9 ; j ++)
         {
-            cout<<problem[i][j] << " ";
+            if(flag == 1)
+            {
+                cout<<problem[i][j] << " ";
+            }
+            else
+            {
+                cout<<problemOriginal[i][j] << " ";
+            }
         }
 
         cout<<endl;
     }
+}
+bool Sudoku::couldChange(int x, int y){
+    if(problemOriginal[x][y])
+        return false;
+    return true;
+}
+
+int Sudoku::getCurrentValue(int x, int y){
+    return problem[x][y];
+}
+void Sudoku::changeValue(int x, int y, int z){
+    problem[x][y] = z;
+}
+void Sudoku::reset(){
+    memcpy((void*)problem, (void*)problemOriginal, 81*sizeof(int));
+}
+void Sudoku::decreaseEmptySlot(){
+    emptySlot--;
+}
+int Sudoku::getEmptySlot(){
+    return emptySlot;
 }

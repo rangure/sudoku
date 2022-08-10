@@ -1,4 +1,5 @@
-#include <istream>
+#include <iostream>
+#include <stdio.h>
 #include <vector>
 #include "sudoku.h"
 using namespace std;
@@ -29,7 +30,7 @@ int main()
         {0,0,0,0,0,0,0,0,0}
     };
     char flag;
-    while(0)
+    while(1)
     {
         cout << "Press 1 to play, Press 2 to solve" << endl;
         cin >> flag;
@@ -39,18 +40,68 @@ int main()
         }
         cout << "Invalid input, try again" << endl;
     }
+    if(flag == '1')
+    {
+        Sudoku s;
+        
+        while(1)
+        {    
+            cout<< "here is your sudoku" <<endl;    
+            s.SudokuPrinter(1);
+            cout<< "which slot and what number do you want to fill?(row, col, num) input 0,0,0 to reset sudoku" <<endl;
+            int row, col, num;
+            int ret = scanf("%d, %d, %d", &row, &col, &num);
+            if (ret == 3 && !num && !row && !col)
+            {
+                cout << "Reseting..." <<endl;
+                s.reset();
+                continue;
+            }
 
-    Sudoku s;
-    s.SudokuPrinter();
-    // int x ,y ,z;
-    // cin >> x;
-    // cin >> y;
-    // cin >> z;
-    // s.problem[x][y] = z;
-    // cout << endl;
-    // s.SudokuPrinter();
-    // cout << s.isValid(x,y) << endl;
-    s.SudokuSolver();
-    s.SudokuPrinter();
+            if(ret != 3 || num <1 || num >9 || row < 0 || row > 9 || col <0 || col > 9)
+            {
+                cout << "Invalid input, try again" <<  endl;
+                while(getchar() != '\n');
+                continue;
+            }
+
+            if(!s.couldChange(row, col))
+            {
+                cout <<"Invalid position, cant change the problem" << endl;
+                continue;    
+            }
+            int oldValue = s.getCurrentValue(row,col);
+            s.changeValue(row,col,num);
+            if( !s.isValid(row, col))
+            {
+                cout << num << " does not comply with sudoku rules at position "<< row << " " << col <<", try again" << endl;
+                s.changeValue(row, col, oldValue);
+                continue;
+            }
+            s.decreaseEmptySlot();
+            int slotNum = s.getEmptySlot();
+            if(slotNum == 0)
+            {
+                cout <<"Congratulations! you successfully solved the puzzle!" << endl;
+                cout << "Solution :" << endl;
+                s.SudokuPrinter(1);
+                break;
+            }
+
+        }
+
+    }
+    // s.SudokuPrinter(1);
+    // s.SudokuPrinter(0);
+    // // int x ,y ,z;
+    // // cin >> x;
+    // // cin >> y;
+    // // cin >> z;
+    // // s.problem[x][y] = z;
+    // // cout << endl;
+    // // s.SudokuPrinter();
+    // // cout << s.isValid(x,y) << endl;
+    // s.SudokuSolver();
+    // s.SudokuPrinter(1);
     return 0;
 }
